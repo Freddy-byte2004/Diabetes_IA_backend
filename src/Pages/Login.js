@@ -6,7 +6,7 @@ function onSubmit(event) {
 }
 function Login() {
 return( 
-  <div className='Contenedor-principal'>
+  <div className='Contenedor-principal-login'>
     <div className='Contenedor-login'>
         <div className='logo'>
             <img src={Logo} alt="Logo de la aplicación" />  

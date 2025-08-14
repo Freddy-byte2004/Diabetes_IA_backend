@@ -1,0 +1,104 @@
+.navbar{
+    background-color: rgb(201, 211, 255);
+    height: 87vh;
+    width: 16vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 20px;
+
+}
+.navar-brand{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20vh;
+    width: 100vw;
+  
+
+}
+.logo-navbar{
+    width: 34vh;
+    height: 100px;
+    border-radius: 20px;
+   
+}
+
+.navbar-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+}
+.Inicio{
+    width: 90%;
+    height: 35px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    font-size: 17px;
+    color: #01121d;
+    text-decoration: none;
+    margin:  5px;
+
+    
+}
+.Inicio:hover,
+.NuevoAnalisis:hover,
+.Perfil:hover,
+.Historial:hover,
+.CerrarSesion:hover {
+    background-color: rgba(135, 168, 216, 0.993);
+    border-radius: 10px;
+    
+    
+}
+
+.NuevoAnalisis{
+    width: 90%;
+    height: 35px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    font-size: 17px;
+    color: #01121d;
+    text-decoration: none;
+     margin: 5px;
+}
+.Perfil{
+    width: 90%;
+    height: 35px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    font-size: 17px;
+    color: #01121d;
+    text-decoration: none;
+     margin:  5px;
+    
+}
+.Historial{
+    width: 90%;
+    height: 35px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    font-size: 17px;
+    color: #01121d;
+    text-decoration: none;
+     margin:  5px;
+}
+.CerrarSesion{
+    width: 90%;
+    height: 35px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    font-size: 17px;
+    color: #01121d;
+    text-decoration: none;
+     margin: 5px;
+    
+}
+

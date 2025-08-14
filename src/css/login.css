@@ -1,4 +1,4 @@
- .Contenedor-principal{
+ .Contenedor-principal-login{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -45,14 +45,16 @@ input[type="password"]  {
 input[type="submit" ]{
     border: none;
   outline: none;
-  background: transparent;
+  color:#001113;
   box-shadow: none;
   font-family: 'Montserrat', Arial, sans-serif;
   font-size: 1rem;
   width: 100%;
   padding: 8px 0;
   color: white;
+  background-color: #5988ce;
 }
+
 h1{
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 24px;
@@ -68,14 +70,18 @@ h1{
     padding:10px;
  }
  .boton{
-    background-color: #6399e9;
-    color: #6399e9;
+    background-color: #5988ce;
+   
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
+ }
+ .boton:hover{
+    
+    cursor: pointer;
  }
 
  .Olvido-contrasena{

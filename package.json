@@ -1,8 +1,16 @@
 {
+  "name": "diabetes-ia-backend",
+  "version": "1.0.0",
+  "description": "API backend para el proyecto Diabetes IA",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "mysql2": "^3.14.3"
+    "express": "^4.18.2",
+    "mysql2": "^3.9.0"
   }
 }

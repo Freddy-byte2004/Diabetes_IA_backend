@@ -9,6 +9,6 @@ app.use(cors())
 app.use('/api', usuario_ruta);
 app.use('/api', auth_ruta);
 app.use('/api', analisis_ruta);
-app.listen(3000, () => {
-  console.log('Servidor en el puerto 3000 ');
+app.listen(3001, () => {
+  console.log('Servidor en el puerto 3001 ');
 });

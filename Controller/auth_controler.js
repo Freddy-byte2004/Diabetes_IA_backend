@@ -16,7 +16,7 @@ class authControler{
                 if(err){ 
                     res.status(400).json({message: 'Error al registrar usuario'}) 
                 } 
-                res.status(201).json(result) 
+                res.status(201).json({message: 'Usuario registrado exitosamente'} ) 
             } ) 
         } ) 
     } 

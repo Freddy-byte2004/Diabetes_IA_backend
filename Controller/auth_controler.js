@@ -1,5 +1,5 @@
 database= require('../database/conexion'); 
-const bcrypt= require('bcrypt');
+const bcrypt= require('bcryptjs');
 const salt_round=10;
 class authControler{ 
     constructor(){} 

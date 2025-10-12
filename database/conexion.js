@@ -10,7 +10,8 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false } 
+  ssl: { require: true,
+    rejectUnauthorized: false } 
 });
 const conexion = pool;
 

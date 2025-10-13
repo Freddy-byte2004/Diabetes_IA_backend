@@ -12,11 +12,11 @@ class authControler {
                 return res.status(500).send(err.message);
             }
             database.query(
-                'INSERT INTO perfil(usuario, contraseña) VALUES ($1, $2)',
+                'INSERT INTO perfil(usuario, contrasena) VALUES ($1, $2)',
                 [usuario, hash],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).json({ message: 'Error al registrar usuario' });
+                        return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
                     }
                     res.status(201).json({ message: 'Usuario registrado exitosamente' });
                 }
@@ -32,13 +32,13 @@ class authControler {
                 [usuario],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).json({ message: 'Error al iniciar sesión' });
+                        return res.status(400).json({ message: 'Error al iniciar sesión', error: err.message });
                     }
                     if (result.rows.length === 0) {
                         return res.status(401).json({ message: 'Usuario no encontrado' });
                     }
                     const usuarioDB = result.rows[0];
-                    bcrypt.compare(contrasena, usuarioDB.contraseña, (err, comprobado) => {
+                    bcrypt.compare(contrasena, usuarioDB.contrasena, (err, comprobado) => {
                         if (err) {
                             return res.status(500).json({ message: 'Error al comparar contraseñas' });
                         }

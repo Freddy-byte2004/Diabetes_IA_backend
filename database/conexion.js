@@ -1,7 +1,6 @@
 
 const { Pool } = require('pg');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();

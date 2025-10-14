@@ -6,7 +6,7 @@ class usuarioController {
         const { correo } = req.params;
         try {
             database.query(
-                'SELECT u.id_usuario FROM usuario u JOIN perfil p ON u.id_usuario = p.id WHERE p.usuario = $1',
+                'SELECT u.id_usuario FROM usuario u JOIN perfil p ON u.id_perfil = p.id WHERE p.usuario = $1',
                 [correo],
                 (err, result) => {
                     if (err) {

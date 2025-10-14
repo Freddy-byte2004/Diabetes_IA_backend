@@ -84,7 +84,7 @@ class AnalisisController {
         const { id_usuario } = req.params;
         try {
             database.query(
-                'SELECT probabilidad_diabetes FROM analisis WHERE id_usuario = $1 ORDER BY fecha_de_analisis DESC LIMIT 1',
+                'SELECT probabilidad_diabetes FROM analisis WHERE id_usuario = $1 ORDER BY id_analisis DESC LIMIT 1',
                 [id_usuario],
                 (error, result) => {
                     if (error) {

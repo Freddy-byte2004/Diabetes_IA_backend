@@ -7,27 +7,31 @@ class authControler {
 
     RegistroUsuario(req, res) {
         const { usuario, contrasena, nombre, apellido } = req.body;
-        database.query("INSERT INTO usuario(nombre,apellido) VALUES ($1,$2)", [nombre, apellido], (err, result) => {
-            if (err){
-                return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
-            }
-            return res.status(200).json({ message: 'Usuario registrado exitosamente en la tabla usuario' });
-        });
         bcrypt.hash(contrasena, salt_round, (err, hash) => {
             if (err) {
                 return res.status(500).send(err.message);
             }
             database.query(
-                'INSERT INTO perfil(usuario, contrasena) VALUES ($1, $2)',
+                'INSERT INTO perfil(usuario, contrasena) VALUES ($1, $2) RETURNING id_perfil',
                 [usuario, hash],
                 (err, result) => {
                     if (err) {
                         return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
                     }
                     res.status(201).json({ message: 'Usuario registrado exitosamente' });
+                    const id_perfil = result.rows[0].id_perfil;
                 }
             );
         });
+        database.query("INSERT INTO usuario(nombre,apellido,id_perfil) VALUES ($1,$2,$3)", [nombre, apellido, id_perfil], (err, result) => {
+            if (err){
+                return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
+            }
+            return res.status(200).json({ message: 'Usuario registrado exitosamente en la tabla usuario' });
+        });
+        
+
+
     }
 
     InicioSesion(req, res) {

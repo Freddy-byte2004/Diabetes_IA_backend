@@ -6,7 +6,13 @@ class authControler {
     constructor() {}
 
     RegistroUsuario(req, res) {
-        const { usuario, contrasena } = req.body;
+        const { usuario, contrasena, nombre, apellido } = req.body;
+        database.query("INSERT INTO usuario(nombre,apellido) VALUES ($1,$2)", [nombre, apellido], (err, result) => {
+            if (err){
+                return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
+            }
+            return res.status(200).json({ message: 'Usuario registrado exitosamente en la tabla usuario' });
+        });
         bcrypt.hash(contrasena, salt_round, (err, hash) => {
             if (err) {
                 return res.status(500).send(err.message);

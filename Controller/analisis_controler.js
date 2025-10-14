@@ -32,7 +32,7 @@ class AnalisisController {
 
         try {
             // Llama a la api de Python para obtener la predicción
-            const response = await axios.post('http://localhost:5000/predict', {
+            const response = await axios.post('https://microserviciomodelo.onrender.com/predict', {
                 features: features
             });
 

@@ -14,14 +14,14 @@ class authControler {
         }
 
         database.query(
-            'INSERT INTO perfil(usuario, contrasena) VALUES ($1, $2) RETURNING id_perfil',
+            'INSERT INTO perfil(usuario, contrasena) VALUES ($1, $2) RETURNING id',
             [usuario, hash],
             (err, result) => {
                 if (err) {
                     return res.status(400).json({ message: 'Error al registrar perfil', error: err.message });
                 }
 
-                const id_perfil = result.rows[0].id_perfil;
+                const id_perfil = result.rows[0].id;
 
                 database.query(
                     'INSERT INTO usuario(nombre, apellido, id_perfil) VALUES ($1, $2, $3)',

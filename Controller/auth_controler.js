@@ -18,7 +18,7 @@ class authControler {
                     if (err) {
                         return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
                     }
-                    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+                  
                     const id_perfil = result.rows[0].id_perfil;
                 }
             );

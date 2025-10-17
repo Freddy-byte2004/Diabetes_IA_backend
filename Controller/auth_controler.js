@@ -65,10 +65,10 @@ class authControler {
                         }
                         if(comprobado){
 
-                            jwt.sign({
+                            const token=jwt.sign({
                                 id: usuarioDB.id,
                                 usuario: usuarioDB.usuario
-                            }, process.env.JWT_SECRET,{expiresIN: '12h'});
+                            }, process.env.JWT_SECRET,{expiresIn: '12h'});
 
                              return res.status(200).json({ message: 'Inicio de sesión exitoso', token });
                         }

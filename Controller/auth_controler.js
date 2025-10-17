@@ -1,5 +1,7 @@
 const database = require('../database/conexion');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const salt_round = 10;
 
 class authControler {
@@ -61,7 +63,16 @@ class authControler {
                         if (!comprobado) {
                             return res.status(401).json({ message: 'Contraseña incorrecta' });
                         }
-                        return res.status(200).json({ message: 'Inicio de sesión exitoso' });
+                        if(comprobado){
+
+                            jwt.sign({
+                                id: usuarioDB.id,
+                                usuario: usuarioDB.usuario
+                            }, process.env.JWT_SECRET,{expiresIN: '12h'});
+
+                             return res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+                        }
+                       
                     });
                 }
             );

@@ -69,8 +69,8 @@ class authControler {
                                 id: usuarioDB.id,
                                 usuario: usuarioDB.usuario
                             }, process.env.JWT_SECRET,{expiresIn: '12h'});
-                            // ejemplo en tu componente de login
-                                localStorage.setItem('token',token);
+                            
+                               
 
                              return res.status(200).json({ message: 'Inicio de sesión exitoso', token });
                         }

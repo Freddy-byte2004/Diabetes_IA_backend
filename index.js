@@ -2,10 +2,20 @@ const express= require('express');
 const usuario_ruta = require('./Routes/usuario_ruta');
 const auth_ruta = require('./Routes/auth_route');
 const analisis_ruta = require('./Routes/analisis_route');
+const helmet=require('helmet');
+const rateLimit = require('express-rate-limit');
 const cors= require('cors')
+
+const limit= rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Demasiadas solicitudes desde esta IP, por favor intente de nuevo después de 15 minutos'
+});
 const app= express();
 app.use(express.json());
-app.use(cors())
+app.use(cors());
+app.use(helmet());
+app.use(limit);
 app.use('/api', usuario_ruta);
 app.use('/api', auth_ruta);
 app.use('/api', analisis_ruta);

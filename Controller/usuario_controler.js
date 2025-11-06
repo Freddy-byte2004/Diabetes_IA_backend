@@ -64,6 +64,31 @@ class usuarioController {
         }
     }
 
+
+            actualizarUsuario(req, res) {
+    const { id } = req.params;
+    const { cedula, telefono, direccion } = req.body;
+    try {
+        database.query(
+            'UPDATE usuario SET cedula = $1, telefono = $2, direccion = $3 WHERE id_usuario = $4 RETURNING *',
+            [cedula, telefono, direccion, id],
+            (err, result) => {
+                if (err) {
+                    return res.status(400).send(err.message);
+                }
+                if (result.rows.length > 0) {
+                    return res.status(200).json(result.rows[0]);
+                } else {
+                    return res.status(404).send('Usuario no encontrado');
+                }
+            }
+        );
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+}
+
+    
     eliminarUsuario(req, res) {
         const { id } = req.params;
         try {

@@ -67,11 +67,11 @@ class usuarioController {
 
             actualizarUsuario(req, res) {
     const { id } = req.params;
-    const { cedula, telefono, direccion } = req.body;
+    const { nombre, apellido, cedula, telefono, direccion } = req.body;
     try {
         database.query(
-            'UPDATE usuario SET cedula = $1, telefono = $2, direccion = $3 WHERE id_usuario = $4 RETURNING *',
-            [cedula, telefono, direccion, id],
+            'UPDATE usuario SET nombre = $1, apellido = $2, cedula = $3, telefono = $4, direccion = $5 WHERE id_usuario = $6 RETURNING *',
+            [nombre, apellido, cedula, telefono, direccion, id],
             (err, result) => {
                 if (err) {
                     return res.status(400).send(err.message);

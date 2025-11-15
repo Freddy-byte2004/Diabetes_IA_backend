@@ -1,7 +1,8 @@
 const database = require('../database/conexion');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+
+import { Resend } from 'resend'
 require('dotenv').config();
 const salt_round = 10;
 
@@ -104,20 +105,14 @@ class authControler {
             );
 
             // Configurar envío de correo
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
-
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: usuario,
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            await resend.emails.send({
+                from: 'onboarding@resend.dev', // remitente verificado
+                to: usuario,  // destinatario
                 subject: 'Código de recuperación',
-                text: `Tu código de recuperación es: ${codigo}`
-            });
+                html: `<p>Tu código de recuperación es <strong>${codigo}</strong></p>`
+                });
+
 
             return res.status(200).json({ message: 'Código enviado al correo' });
         } catch (err) {

@@ -2,7 +2,7 @@ const database = require('../database/conexion');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-import { Resend } from 'resend'
+const {Resend}= require('resend');
 require('dotenv').config();
 const salt_round = 10;
 

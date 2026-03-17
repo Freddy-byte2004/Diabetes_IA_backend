@@ -5,6 +5,8 @@ const analisis_ruta = require('./Routes/analisis_route');
 const helmet=require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors= require('cors')
+const dotenv= require('dotenv');
+dotenv.config();
 
 const limit= rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -19,6 +21,10 @@ app.use(limit);
 app.use('/api', usuario_ruta);
 app.use('/api', auth_ruta);
 app.use('/api', analisis_ruta);
-app.listen(5432, () => {
+/*app.listen(5432, () => {
   console.log('Servidor en el puerto 5432');
+});
+*/
+app.listen(process.env.PORT || 5432, () => {
+  console.log(`Servidor en el puerto ${process.env.PORT || 5432}`);
 });

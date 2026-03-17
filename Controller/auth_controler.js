@@ -6,16 +6,23 @@ require('dotenv').config();
 const salt_round = 10;
 
 function createMailTransporter() {
-    const smtpPort = Number(process.env.SMTP_PORT || 465);
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
+    const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
 
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
         port: smtpPort,
         secure: smtpPort === 465,
+        requireTLS: smtpPort === 587,
         auth: {
             user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            pass: smtpPass,
         },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+        logger: true,
+        debug: true,
     });
 }
 
@@ -100,6 +107,8 @@ class authControler {
     async EnviarCodigo(req, res) {
         const { usuario } = req.body; // correo o usuario
         try {
+            console.log('[EnviarCodigo] Inicio del flujo para:', usuario);
+
             if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
                 return res.status(500).json({ message: 'SMTP no configurado correctamente' });
             }
@@ -108,9 +117,12 @@ class authControler {
                 'SELECT * FROM perfil WHERE usuario=$1',
                 [usuario]
             );
+
             if (result.rows.length === 0) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
+
+            console.log('[EnviarCodigo] Usuario encontrado');
 
             // Generar código aleatorio de 6 dígitos
             const codigo = Math.floor(100000 + Math.random() * 900000);
@@ -121,7 +133,10 @@ class authControler {
                 [codigo, usuario]
             );
 
+            console.log('[EnviarCodigo] Codigo guardado en BD');
+
             const transporter = createMailTransporter();
+            console.log('[EnviarCodigo] Enviando correo via SMTP...');
             await transporter.sendMail({
                 from: process.env.SMTP_FROM || process.env.SMTP_USER,
                 to: usuario,
@@ -129,8 +144,11 @@ class authControler {
                 html: `<p>Tu código de recuperación es <strong>${codigo}</strong></p>`,
             });
 
+            console.log('[EnviarCodigo] Correo enviado correctamente');
+
             return res.status(200).json({ message: 'Código enviado al correo' });
         } catch (err) {
+            console.error('[EnviarCodigo] Error:', err);
             return res.status(500).json({ message: 'Error al enviar código', error: err.message });
         }
     }

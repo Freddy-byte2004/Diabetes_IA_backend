@@ -1,10 +1,23 @@
 const database = require('../database/conexion');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const {Resend}= require('resend');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 const salt_round = 10;
+
+function createMailTransporter() {
+    const smtpPort = Number(process.env.SMTP_PORT || 465);
+
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+    });
+}
 
 class authControler {
     constructor() {}
@@ -87,6 +100,10 @@ class authControler {
     async EnviarCodigo(req, res) {
         const { usuario } = req.body; // correo o usuario
         try {
+            if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+                return res.status(500).json({ message: 'SMTP no configurado correctamente' });
+            }
+
             const result = await database.query(
                 'SELECT * FROM perfil WHERE usuario=$1',
                 [usuario]
@@ -104,15 +121,13 @@ class authControler {
                 [codigo, usuario]
             );
 
-            // Configurar envío de correo
-            const resend = new Resend(process.env.RESEND_API_KEY);
-            await resend.emails.send({
-                from: 'onboarding@resend.dev', // remitente verificado
-                to: usuario,  // destinatario
+            const transporter = createMailTransporter();
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM || process.env.SMTP_USER,
+                to: usuario,
                 subject: 'Código de recuperación',
-                html: `<p>Tu código de recuperación es <strong>${codigo}</strong></p>`
-                });
-
+                html: `<p>Tu código de recuperación es <strong>${codigo}</strong></p>`,
+            });
 
             return res.status(200).json({ message: 'Código enviado al correo' });
         } catch (err) {

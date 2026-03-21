@@ -13,17 +13,17 @@ class authControler {
     constructor() {}
 
     RegistroUsuario(req, res) {
-    const { usuario, contrasena, nombre, apellido } = req.body;
+    const { usuario, contrasena, nombre, direccion } = req.body;
     const codigoUnico = generarCodigoUnico();
 
     bcrypt.hash(contrasena, salt_round, (err, hash) => {
         if (err) {
-            return res.status(500).send({ message: 'Error al encriptar contraseña', error: err.message });
+            return res.status(500).send({ message: 'No se pudo procesar la contraseña' });
         }
 
         bcrypt.hash(codigoUnico, salt_round, (errCodigo, hashCodigo) => {
             if (errCodigo) {
-                return res.status(500).send({ message: 'Error al encriptar codigo unico', error: errCodigo.message });
+                return res.status(500).send({ message: 'No se pudo generar el codigo de verificacion' });
             }
 
             database.query(
@@ -31,17 +31,17 @@ class authControler {
                 [usuario, hash, hashCodigo],
                 (err, result) => {
                 if (err) {
-                    return res.status(400).json({ message: 'Error al registrar perfil', error: err.message });
+                    return res.status(400).json({ message: 'No se pudo registrar el perfil' });
                 }
 
                 const id_perfil = result.rows[0].id;
 
                 database.query(
-                    'INSERT INTO usuario(nombre, apellido, id_perfil) VALUES ($1, $2, $3)',
-                    [nombre, apellido, id_perfil],
+                    'INSERT INTO usuario(nombre, direccion, id_perfil) VALUES ($1, $2, $3)',
+                    [nombre, direccion, id_perfil],
                     (err, result) => {
                         if (err) {
-                            return res.status(400).json({ message: 'Error al registrar usuario', error: err.message });
+                            return res.status(400).json({ message: 'No se pudo registrar el usuario' });
                         }
 
                         return res.status(200).json({
@@ -65,7 +65,7 @@ class authControler {
                 [usuario],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).json({ message: 'Error al iniciar sesión', error: err.message });
+                        return res.status(500).json({ message: 'No se pudo iniciar sesion' });
                     }
                     if (result.rows.length === 0) {
                         return res.status(401).json({ message: 'Usuario no encontrado' });
@@ -117,7 +117,7 @@ class authControler {
 
             return res.status(200).json({ message: 'Código válido' });
         } catch (err) {
-            return res.status(500).json({ message: 'Error al verificar código', error: err.message });
+            return res.status(500).json({ message: 'No se pudo verificar el codigo' });
         }
     }
 
@@ -133,7 +133,7 @@ class authControler {
             );
             return res.status(200).json({ message: 'Nuevo código generado', codigo_unico: nuevoCodigo });
         } catch (err) {
-            return res.status(500).json({ message: 'Error al generar nuevo código único', error: err.message });
+            return res.status(500).json({ message: 'No se pudo generar un nuevo codigo' });
         }
     }
 
@@ -148,7 +148,7 @@ class authControler {
             );
             return res.status(200).json({ message: 'Contraseña cambiada exitosamente' });
         } catch (err) {
-            return res.status(500).json({ message: 'Error al cambiar contraseña', error: err.message });
+            return res.status(500).json({ message: 'No se pudo cambiar la contraseña' });
         }
     }
 }

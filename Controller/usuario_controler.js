@@ -10,7 +10,7 @@ class usuarioController {
                 [correo],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).send(err.message);
+                        return res.status(500).json({ message: 'No se pudo obtener el id del usuario' });
                     }
                     if (result.rows.length > 0) {
                         return res.status(200).json(result.rows[0]);
@@ -32,7 +32,7 @@ class usuarioController {
                 [id],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).send(err.message);
+                        return res.status(500).json({ message: 'No se pudo obtener el usuario' });
                     }
                     if (result.rows.length > 0) {
                         return res.status(200).json(result.rows);
@@ -50,11 +50,11 @@ class usuarioController {
         const { id_perfil, cedula, telefono, direccion } = req.body;
         try {
             database.query(
-                'INSERT INTO usuario (id_perfil, cedula, telefono, direccion) VALUES ($1, $2, $3, $4) RETURNING *',
-                [id_perfil, cedula, telefono, direccion],
+                'INSERT INTO usuario (id_perfil, telefono, direccion) VALUES ($1, $2, $3) RETURNING *',
+                [id_perfil, telefono, direccion],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).send(err.message);
+                        return res.status(500).json({ message: 'No se pudo crear el usuario' });
                     }
                     return res.status(201).json(result.rows[0]);
                 }
@@ -67,14 +67,14 @@ class usuarioController {
 
             actualizarUsuario(req, res) {
     const { id } = req.params;
-    const { nombre, apellido, cedula, telefono, direccion } = req.body;
+    const { nombre, telefono, direccion } = req.body;
     try {
         database.query(
-            'UPDATE usuario SET nombre = $1, apellido = $2, cedula = $3, telefono = $4, direccion = $5 WHERE id_usuario = $6 RETURNING *',
-            [nombre, apellido, cedula, telefono, direccion, id],
+            'UPDATE usuario SET nombre = $1, telefono = $2, direccion = $3 WHERE id_usuario = $4 RETURNING *',
+            [nombre, telefono, direccion, id],
             (err, result) => {
                 if (err) {
-                    return res.status(400).send(err.message);
+                    return res.status(500).json({ message: 'No se pudo actualizar el usuario' });
                 }
                 if (result.rows.length > 0) {
                     return res.status(200).json(result.rows[0]);
@@ -97,7 +97,7 @@ class usuarioController {
                 [id],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).send(err.message);
+                        return res.status(500).json({ message: 'No se pudo eliminar el usuario' });
                     }
                     return res.status(200).json(result.rows[0]);
                 }
@@ -115,7 +115,7 @@ class usuarioController {
                 [id],
                 (err, result) => {
                     if (err) {
-                        return res.status(400).send(err.message);
+                        return res.status(500).json({ message: 'No se pudieron obtener los analisis del usuario' });
                     }
                     if (result.rows.length > 0) {
                         return res.status(200).json(result.rows);

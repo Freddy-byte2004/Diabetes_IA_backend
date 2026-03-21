@@ -7,7 +7,7 @@ class AnalisisController {
     async crearAnalisis(req, res) {
         let Probabilidad_diabetes;
         const {
-            id_usuario,
+            id_paciente,
             glucosa,
             insulina,
             numero_de_embarazos,
@@ -42,9 +42,9 @@ class AnalisisController {
         }
 
         database.query(
-            'INSERT INTO analisis (id_usuario, glucosa, insulina, numero_de_embarazos, presion_arterial, grosor_de_piel, indice_de_masa_corporal, funcion_de_herencia, edad, probabilidad_diabetes, fecha_de_analisis) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id_analisis',
+            'INSERT INTO analisis (id_paciente, glucosa, insulina, numero_de_embarazos, presion_arterial, grosor_de_piel, indice_de_masa_corporal, funcion_de_herencia, edad, probabilidad_diabetes, fecha_de_analisis) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id_analisis',
             [
-                id_usuario,
+                id_paciente,
                 glucosa,
                 insulina,
                 numero_de_embarazos,
@@ -58,7 +58,7 @@ class AnalisisController {
             ],
             (error, result) => {
                 if (error) {
-                    return res.status(500).json(error.message);
+                    return res.status(500).json({ message: 'No se pudo crear el analisis' });
                 }
                 return res.status(201).json({ message: 'Análisis creado', id: result.rows[0].id_analisis });
             }
@@ -66,29 +66,47 @@ class AnalisisController {
     }
 
     obtenerAnalisis(req, res) {
-        const { id } = req.params;
+        const id_paciente = req.params.id_paciente || req.params.id;
 
         database.query(
-            'SELECT * FROM analisis WHERE id_usuario = $1',
-            [id],
+            'SELECT * FROM analisis WHERE id_paciente = $1',
+            [id_paciente],
             (error, result) => {
                 if (error) {
-                    return res.status(500).json(error.message);
+                    return res.status(500).json({ message: 'No se pudieron obtener los analisis del paciente' });
                 }
                 return res.status(200).json(result.rows);
             }
         );
     }
 
+    obtenerUltimoAnalisis(req, res) {
+        const id_paciente = req.params.id_paciente || req.params.id;
+
+        database.query(
+            'SELECT * FROM analisis WHERE id_paciente = $1 ORDER BY fecha_de_analisis DESC NULLS LAST, id_analisis DESC LIMIT 1',
+            [id_paciente],
+            (error, result) => {
+                if (error) {
+                    return res.status(500).json({ message: 'No se pudo obtener el ultimo analisis del paciente' });
+                }
+                if (result.rows.length === 0) {
+                    return res.status(404).json({ message: 'El paciente no tiene analisis registrados' });
+                }
+                return res.status(200).json(result.rows[0]);
+            }
+        );
+    }
+
     obtenerProbabilidad(req, res) {
-        const { id_usuario } = req.params;
+        const id_paciente = req.params.id_paciente || req.params.id_usuario;
         try {
             database.query(
-                'SELECT probabilidad_diabetes FROM analisis WHERE id_usuario = $1 ORDER BY id_analisis DESC LIMIT 1',
-                [id_usuario],
+                'SELECT probabilidad_diabetes FROM analisis WHERE id_paciente = $1 ORDER BY id_analisis DESC LIMIT 1',
+                [id_paciente],
                 (error, result) => {
                     if (error) {
-                        return res.status(401).json(error.message);
+                        return res.status(500).json({ message: 'No se pudo obtener la probabilidad' });
                     }
                     if (result.rows.length === 0) {
                         return res.status(404).json({ message: 'No se encontró probabilidad para este usuario' });
@@ -97,19 +115,19 @@ class AnalisisController {
                 }
             );
         } catch (error) {
-            return res.status(500).json(error.message);
+            return res.status(500).json({ message: 'Error interno al consultar la probabilidad' });
         }
     }
 
     eliminarAnalisis(req, res) {
-        const { id } = req.params;
+        const id_paciente = req.params.id_paciente || req.params.id;
 
         database.query(
-            'DELETE FROM analisis WHERE id_usuario = $1 RETURNING *',
-            [id],
+            'DELETE FROM analisis WHERE id_paciente = $1 RETURNING *',
+            [id_paciente],
             (error, result) => {
                 if (error) {
-                    return res.status(500).json(error.message);
+                    return res.status(500).json({ message: 'No se pudieron eliminar los analisis del paciente' });
                 }
                 if (result.rows.length === 0) {
                     return res.status(404).json({ message: 'No se encontró ningún análisis para eliminar' });

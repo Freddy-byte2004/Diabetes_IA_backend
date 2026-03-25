@@ -1,5 +1,5 @@
 const database = require('../database/conexion');
-const axios = require('axios');
+const analisisService = require('../Services/analisisService');
 
 class AnalisisController {
     constructor() {}
@@ -31,12 +31,8 @@ class AnalisisController {
         ];
 
         try {
-            // Llama a la api de Python para obtener la predicción
-            const response = await axios.post('https://microserviciomodelo.onrender.com/predict', {
-                features: features
-            });
-
-            Probabilidad_diabetes = response.data.probabilidad_diabetes;
+            // Llama al servicio que consulta el microservicio de modelo
+            Probabilidad_diabetes = await analisisService.getProbability(features);
         } catch (error) {
             Probabilidad_diabetes = null;
         }

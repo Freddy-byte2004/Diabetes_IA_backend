@@ -6,6 +6,7 @@ const paciente_ruta = require('./Routes/paciente_ruta');
 const helmet=require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors= require('cors')
+const authMiddleware = require('./Middlewares/authMiddleware');
 const dotenv= require('dotenv');
 dotenv.config();
 
@@ -16,17 +17,22 @@ const limit= rateLimit({
 });
 const app= express();
 app.use(express.json());
-app.use(cors());
+// CORS configuration: allow origins from env CORS_ORIGIN (comma-separated) or allow all
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(limit);
-app.use('/api', usuario_ruta);
 app.use('/api', auth_ruta);
-app.use('/api', analisis_ruta);
-app.use('/api', paciente_ruta);
-/*app.listen(5432, () => {
-  console.log('Servidor en el puerto 5432');
-});
-*/
+
+app.use('/api', authMiddleware, usuario_ruta);
+app.use('/api', authMiddleware, analisis_ruta);
+app.use('/api', authMiddleware, paciente_ruta);
+
 app.listen(process.env.PORT || 5432, () => {
   console.log(`Servidor en el puerto ${process.env.PORT || 5432}`);
 });

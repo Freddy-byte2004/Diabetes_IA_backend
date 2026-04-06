@@ -10,6 +10,11 @@ const authMiddleware = require('./Middlewares/authMiddleware');
 const dotenv= require('dotenv');
 dotenv.config();
 
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 const limit= rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -17,12 +22,8 @@ const limit= rateLimit({
 });
 const app= express();
 app.use(express.json());
-// CORS configuration: allow origins from env CORS_ORIGIN (comma-separated) or allow all
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+
+
 
 app.use(cors(corsOptions));
 app.use(helmet());

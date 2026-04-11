@@ -29,6 +29,13 @@ class authControler {
                 codigo_unico: codigoUnico
             });
         } catch (err) {
+            if (
+                err.message &&
+                err.message.includes('duplicate key value violates unique constraint') &&
+                err.message.includes('perfil_usuario_key')
+            ) {
+                return res.status(400).json({ message: 'Ya existe un usuario con ese correo' });
+            }
             return res.status(500).json({ message: 'No se pudo registrar el usuario', error: err.message });
         }
     }
@@ -48,7 +55,7 @@ class authControler {
             }
 
             const token = authService.generateToken({ id: usuarioDB.id, usuario: usuarioDB.usuario });
-            return res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+            return res.status(200).json({ message: 'Inicio de sesión exitoso', token, id: usuarioDB.id });
         } catch (err) {
             return res.status(500).json({ message: 'Error al iniciar sesión', error: err.message });
         }

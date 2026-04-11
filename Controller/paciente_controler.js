@@ -4,8 +4,11 @@ class PacienteController {
 	constructor() {}
 
 	obtenerPacientes(req, res) {
+		const { id_institucion } = req.params;
+		   
 		database.query(
-			'SELECT * FROM paciente ORDER BY id_paciente DESC',
+			'SELECT * FROM paciente WHERE id_institucion=$1 ORDER BY id_paciente DESC',
+			[id_institucion],
 			(error, result) => {
 				if (error) {
 					return res.status(500).json({ message: 'No se pudieron obtener los pacientes' });
@@ -34,6 +37,7 @@ class PacienteController {
 	}
 
 	crearPaciente(req, res) {
+		
 		const {
 			cedula,
 			nombre,
@@ -42,11 +46,12 @@ class PacienteController {
 			telefono,
 			sexo,
 			fecha_de_nacimiento,
-			fecha_de_diagnostico
+			fecha_de_diagnostico,
+			id_institucion
 		} = req.body;
 
 		database.query(
-			'INSERT INTO paciente (cedula, nombre, apellido, direccion, telefono, sexo, fecha_de_nacimiento, fecha_de_diagnostico) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+			'INSERT INTO paciente (cedula, nombre, apellido, direccion, telefono, sexo, fecha_de_nacimiento, fecha_de_diagnostico, id_institucion) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
 			[
 				cedula,
 				nombre,
@@ -55,14 +60,16 @@ class PacienteController {
 				telefono,
 				sexo,
 				fecha_de_nacimiento,
-				fecha_de_diagnostico
+				fecha_de_diagnostico,
+				id_institucion
 			],
-			(error, result) => {
-				if (error) {
-					return res.status(500).json({ message: 'No se pudo crear el paciente' });
+				(error, result) => {
+					if (error) {
+						
+						return res.status(500).json({ message: 'No se pudo crear el paciente', error: error.message });
+					}
+					return res.status(201).json(result.rows[0]);
 				}
-				return res.status(201).json(result.rows[0]);
-			}
 		);
 	}
 

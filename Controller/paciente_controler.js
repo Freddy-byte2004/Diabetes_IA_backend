@@ -19,17 +19,21 @@ class PacienteController {
 	}
 
 	obtenerPacientePorID(req, res) {
-		const { id } = req.params;
+		const { id, id_institucion } = req.params;
+
+		if (!id_institucion) {
+			return res.status(400).json({ message: 'Falta el id de la institución' });
+		}
 
 		database.query(
-			'SELECT * FROM paciente WHERE id_paciente = $1',
-			[id],
+			'SELECT * FROM paciente WHERE id_paciente = $1 AND id_institucion = $2',
+			[id, id_institucion],
 			(error, result) => {
 				if (error) {
 					return res.status(500).json({ message: 'No se pudo consultar el paciente' });
 				}
 				if (result.rows.length === 0) {
-					return res.status(404).json({ message: 'Paciente no encontrado' });
+					return res.status(404).json({ message: 'Paciente no encontrado o no pertenece a la institución' });
 				}
 				return res.status(200).json(result.rows[0]);
 			}

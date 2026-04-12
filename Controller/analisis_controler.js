@@ -37,6 +37,11 @@ class AnalisisController {
             Probabilidad_diabetes = null;
         }
 
+        // Validación: no registrar si la probabilidad es null o 0
+        if (Probabilidad_diabetes === null || Probabilidad_diabetes === 0) {
+            return res.status(400).json({ message: 'No se pudo obtener una probabilidad válida del modelo. El análisis no será registrado.' });
+        }
+
         database.query(
             'INSERT INTO analisis (id_paciente, glucosa, insulina, numero_de_embarazos, presion_arterial, grosor_de_piel, indice_de_masa_corporal, funcion_de_herencia, edad, probabilidad_diabetes, fecha_de_analisis) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id_analisis',
             [

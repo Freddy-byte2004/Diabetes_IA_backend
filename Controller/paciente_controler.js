@@ -52,7 +52,7 @@ class PacienteController {
 			fecha_de_nacimiento,
 			fecha_de_diagnostico,
 			id_institucion,
-			grupo_san
+			grupo_sanguineo
 		} = req.body;
 
 		database.query(

@@ -66,7 +66,8 @@ class PacienteController {
 				sexo,
 				fecha_de_nacimiento,
 				fecha_de_diagnostico,
-				id_institucion
+				id_institucion,
+				grupo_sanguineo
 			],
 				(error, result) => {
 					if (error) {
@@ -103,6 +104,7 @@ class PacienteController {
 				sexo,
 				fecha_de_nacimiento,
 				fecha_de_diagnostico,
+				grupo_sanguineo,
 				id
 			],
 			(error, result) => {

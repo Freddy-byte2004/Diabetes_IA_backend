@@ -51,11 +51,12 @@ class PacienteController {
 			sexo,
 			fecha_de_nacimiento,
 			fecha_de_diagnostico,
-			id_institucion
+			id_institucion,
+			grupo_san
 		} = req.body;
 
 		database.query(
-			'INSERT INTO paciente (cedula, nombre, apellido, direccion, telefono, sexo, fecha_de_nacimiento, fecha_de_diagnostico, id_institucion) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+			'INSERT INTO paciente (cedula, nombre, apellido, direccion, telefono, sexo, fecha_de_nacimiento, fecha_de_diagnostico, id_institucion, grupo_sanguineo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
 			[
 				cedula,
 				nombre,
@@ -87,11 +88,12 @@ class PacienteController {
 			telefono,
 			sexo,
 			fecha_de_nacimiento,
-			fecha_de_diagnostico
+			fecha_de_diagnostico,
+			grupo_sanguineo
 		} = req.body;
 
 		database.query(
-			'UPDATE paciente SET cedula = $1, nombre = $2, apellido = $3, direccion = $4, telefono = $5, sexo = $6, fecha_de_nacimiento = $7, fecha_de_diagnostico = $8 WHERE id_paciente = $9 RETURNING *',
+			'UPDATE paciente SET cedula = $1, nombre = $2, apellido = $3, direccion = $4, telefono = $5, sexo = $6, fecha_de_nacimiento = $7, fecha_de_diagnostico = $8, grupo_sanguineo = $9 WHERE id_paciente = $10 RETURNING *',
 			[
 				cedula,
 				nombre,

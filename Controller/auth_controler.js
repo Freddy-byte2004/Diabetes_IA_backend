@@ -7,14 +7,12 @@ class authControler {
 
     async RegistroUsuario(req, res) {
         const { usuario, contrasena, nombre, direccion } = req.body;
-        const codigoUnico = authService.generateUniqueCode();
         try {
             const hash = await authService.hashPassword(contrasena);
-            const hashCodigo = await authService.hashPassword(codigoUnico);
 
             const perfilResult = await database.query(
                 'INSERT INTO perfil(usuario, contrasena, codigo_unico) VALUES ($1, $2, $3) RETURNING id',
-                [usuario, hash, hashCodigo]
+                [usuario, hash, '']
             );
 
             const id_perfil = perfilResult.rows[0].id;
@@ -25,8 +23,7 @@ class authControler {
             );
 
             return res.status(201).json({
-                message: 'Usuario registrado exitosamente',
-                codigo_unico: codigoUnico
+                message: 'Usuario registrado exitosamente'
             });
         } catch (err) {
             if (
@@ -63,6 +60,10 @@ class authControler {
 
     async VerificarCodigo(req, res) {
         const { usuario, codigo } = req.body;
+        if (!usuario || !codigo) {
+            return res.status(400).json({ message: 'Debe enviar usuario y codigo' });
+        }
+
         try {
             const result = await database.query('SELECT codigo_unico FROM perfil WHERE usuario=$1', [usuario]);
             if (result.rows.length === 0) {
@@ -70,6 +71,10 @@ class authControler {
             }
 
             const perfil = result.rows[0];
+            if (!perfil.codigo_unico) {
+                return res.status(400).json({ message: 'No hay un codigo activo para este usuario' });
+            }
+
             const codigoValido = await authService.comparePassword(codigo, perfil.codigo_unico);
             if (!codigoValido) {
                 return res.status(400).json({ message: 'Código incorrecto' });
@@ -83,21 +88,51 @@ class authControler {
 
     async NuevoCodigoUnico(req, res) {
         const { usuario } = req.body;
+        if (!usuario) {
+            return res.status(400).json({ message: 'Debe enviar el usuario' });
+        }
+
         try {
-            const nuevoCodigo = authService.generateUniqueCode();
+            const perfilResult = await database.query('SELECT id FROM perfil WHERE usuario=$1', [usuario]);
+            if (perfilResult.rows.length === 0) {
+                return res.status(404).json({ message: 'Usuario no encontrado' });
+            }
+
+            const nuevoCodigo = authService.generateVerificationCode();
             const hashCodigo = await authService.hashPassword(nuevoCodigo);
             await database.query('UPDATE perfil SET codigo_unico=$1 WHERE usuario=$2', [hashCodigo, usuario]);
-            return res.status(200).json({ message: 'Nuevo código generado', codigo_unico: nuevoCodigo });
+            await authService.sendPasswordResetCodeEmail(usuario, nuevoCodigo);
+
+            return res.status(200).json({ message: 'Codigo de verificacion enviado al correo' });
         } catch (err) {
             return res.status(500).json({ message: 'No se pudo generar un nuevo codigo', error: err.message });
         }
     }
 
     async CambiarContrasena(req, res) {
-        const { usuario, nuevaContrasena } = req.body;
+        const { usuario, codigo, nuevaContrasena } = req.body;
+        if (!usuario || !codigo || !nuevaContrasena) {
+            return res.status(400).json({ message: 'Debe enviar usuario, codigo y nuevaContrasena' });
+        }
+
         try {
+            const result = await database.query('SELECT codigo_unico FROM perfil WHERE usuario=$1', [usuario]);
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: 'Usuario no encontrado' });
+            }
+
+            const perfil = result.rows[0];
+            if (!perfil.codigo_unico) {
+                return res.status(400).json({ message: 'No hay un codigo activo para este usuario' });
+            }
+
+            const codigoValido = await authService.comparePassword(codigo, perfil.codigo_unico);
+            if (!codigoValido) {
+                return res.status(400).json({ message: 'Código incorrecto' });
+            }
+
             const hash = await authService.hashPassword(nuevaContrasena);
-            await database.query('UPDATE perfil SET contrasena=$1 WHERE usuario=$2', [hash, usuario]);
+            await database.query('UPDATE perfil SET contrasena=$1, codigo_unico=$2 WHERE usuario=$3', [hash, '', usuario]);
             return res.status(200).json({ message: 'Contraseña cambiada exitosamente' });
         } catch (err) {
             return res.status(500).json({ message: 'No se pudo cambiar la contraseña', error: err.message });

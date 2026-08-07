@@ -57,6 +57,29 @@ async function sendPasswordResetCodeEmail(toEmail, code) {
   }
 }
 
+async function sendAccountVerificationCodeEmail(toEmail, code) {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY no esta configurada');
+  }
+
+  const fromEmail = process.env.RESEND_FROM || process.env.RESEND_SENDER_EMAIL || process.env.BREVO_SENDER_EMAIL;
+  if (!fromEmail) {
+    throw new Error('RESEND_FROM no esta configurada');
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { error } = await resend.emails.send({
+    from: fromEmail,
+    to: [toEmail],
+    subject: 'Verifica tu cuenta',
+    text: `Tu codigo de verificacion es: ${code}. Este codigo expira en 15 minutos.`
+  });
+
+  if (error) {
+    throw new Error(error.message || 'No se pudo enviar el correo con Resend');
+  }
+}
+
 module.exports = {
   generateUniqueCode,
   generateVerificationCode,
@@ -64,5 +87,6 @@ module.exports = {
   comparePassword,
   generateToken,
   verifyToken,
-  sendPasswordResetCodeEmail
+  sendPasswordResetCodeEmail,
+  sendAccountVerificationCodeEmail
 };

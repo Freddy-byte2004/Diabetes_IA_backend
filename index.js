@@ -1,6 +1,7 @@
 const express= require('express');
 const usuario_ruta = require('./Routes/usuario_ruta');
 const auth_ruta = require('./Routes/auth_route');
+const verificacion_ruta = require('./Routes/verificacion_ruta');
 const analisis_ruta = require('./Routes/analisis_route');
 const paciente_ruta = require('./Routes/paciente_ruta');
 const helmet=require('helmet');
@@ -29,7 +30,6 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(limit);
 app.use('/api', auth_ruta);
-
 app.use('/api', authMiddleware, usuario_ruta);
 app.use('/api', authMiddleware, analisis_ruta);
 app.use('/api', authMiddleware, paciente_ruta);

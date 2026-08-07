@@ -9,10 +9,13 @@ class authControler {
         const { usuario, contrasena, nombre, direccion } = req.body;
         try {
             const hash = await authService.hashPassword(contrasena);
+            const verificationCode = authService.generateVerificationCode();
+            const verificationHash = await authService.hashPassword(verificationCode);
+            const codeExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
             const perfilResult = await database.query(
-                'INSERT INTO perfil(usuario, contrasena, codigo_unico) VALUES ($1, $2, $3) RETURNING id',
-                [usuario, hash, '']
+                'INSERT INTO perfil(usuario, contrasena, codigo_unico, verification_code, code_expires_at, is_verified) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+                [usuario, hash, '', verificationHash, codeExpiresAt, false]
             );
 
             const id_perfil = perfilResult.rows[0].id;
@@ -22,10 +25,12 @@ class authControler {
                 [nombre, direccion, id_perfil]
             );
 
+            await authService.sendAccountVerificationCodeEmail(usuario, verificationCode);
+
             return res.status(201).json({
-                message: 'Usuario registrado exitosamente'
+                message: 'Usuario registrado exitosamente. Revisa tu correo para verificar tu cuenta.'
             });
-        } catch (err) {
+        }    catch (err) {
             if (
                 err.message &&
                 err.message.includes('duplicate key value violates unique constraint') &&
@@ -49,6 +54,12 @@ class authControler {
             const valid = await authService.comparePassword(contrasena, usuarioDB.contrasena);
             if (!valid) {
                 return res.status(401).json({ message: 'Contraseña incorrecta' });
+            }
+
+            if (!usuarioDB.is_verified) {
+                return res.status(403).json({
+                    message: 'Debes verificar tu cuenta antes de iniciar sesión'
+                });
             }
 
             const token = authService.generateToken({ id: usuarioDB.id, usuario: usuarioDB.usuario });
@@ -110,25 +121,15 @@ class authControler {
     }
 
     async CambiarContrasena(req, res) {
-        const { usuario, codigo, nuevaContrasena } = req.body;
-        if (!usuario || !codigo || !nuevaContrasena) {
-            return res.status(400).json({ message: 'Debe enviar usuario, codigo y nuevaContrasena' });
+        const { usuario, nuevaContrasena } = req.body;
+        if (!usuario || !nuevaContrasena) {
+            return res.status(400).json({ message: 'Debe enviar usuario y nuevaContrasena' });
         }
 
         try {
-            const result = await database.query('SELECT codigo_unico FROM perfil WHERE usuario=$1', [usuario]);
+            const result = await database.query('SELECT id FROM perfil WHERE usuario=$1', [usuario]);
             if (result.rows.length === 0) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
-
-            const perfil = result.rows[0];
-            if (!perfil.codigo_unico) {
-                return res.status(400).json({ message: 'No hay un codigo activo para este usuario' });
-            }
-
-            const codigoValido = await authService.comparePassword(codigo, perfil.codigo_unico);
-            if (!codigoValido) {
-                return res.status(400).json({ message: 'Código incorrecto' });
             }
 
             const hash = await authService.hashPassword(nuevaContrasena);

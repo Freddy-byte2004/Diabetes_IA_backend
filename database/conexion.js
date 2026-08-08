@@ -6,10 +6,17 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+// Permitir la URL de conexión genérica (o mantener la de Supabase como alternativa)
+const connectionString = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
+
+// Configuración de SSL opcional 
+const sslConfig = process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production' 
+  ? { rejectUnauthorized: false } 
+  : false;
+
 const pool = new Pool({
-  connectionString: process.env.SUPABASE_DB_URL,
-  ssl: { 
-    rejectUnauthorized: false } 
+  connectionString: connectionString,
+  ssl: sslConfig
 });
 const conexion = pool;
 

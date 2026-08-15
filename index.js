@@ -16,10 +16,10 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
-const limit= rateLimit({
+const authLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Demasiadas solicitudes desde esta IP, por favor intente de nuevo después de 15 minutos'
+  max: 15,
+  message: 'Demasiadas solicitudes de autenticacion desde esta IP, por favor intente de nuevo despues de 15 minutos'
 });
 const app= express();
 app.use(express.json());
@@ -28,8 +28,7 @@ app.use(express.json());
 
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(limit);
-app.use('/api', auth_ruta);
+app.use('/api', authLimit, auth_ruta);
 app.use('/api', authMiddleware, usuario_ruta);
 app.use('/api', authMiddleware, analisis_ruta);
 app.use('/api', authMiddleware, paciente_ruta);
